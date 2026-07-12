@@ -1,11 +1,21 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { MessageCircle, Users, User, Settings } from "lucide-react";
+import {
+  MessageCircle,
+  Users,
+  User,
+  Settings,
+  LogOut,
+  Plus,
+  Search,
+} from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NavItem } from "@/components/sidebar/nav-item";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/cn";
 
 interface AppSidebarProps {
@@ -15,57 +25,91 @@ interface AppSidebarProps {
 
 export function AppSidebar({ className, children }: AppSidebarProps) {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const router = useRouter();
+  const { user, signOut } = useAuth();
 
   const displayName =
     user?.user_metadata?.display_name || user?.email || "User";
 
   const navItems = [
-    { href: "/chat", icon: <MessageCircle className="w-5 h-5" />, label: "Chats" },
-    { href: "/contacts", icon: <Users className="w-5 h-5" />, label: "Contacts" },
-    { href: "/profile", icon: <User className="w-5 h-5" />, label: "Profile" },
-    { href: "/settings", icon: <Settings className="w-5 h-5" />, label: "Settings" },
+    { href: "/chat", icon: MessageCircle, label: "Chats" },
+    { href: "/contacts", icon: Users, label: "Contacts" },
+    { href: "/profile", icon: User, label: "Profile" },
+    { href: "/settings", icon: Settings, label: "Settings" },
   ];
 
   return (
     <div
       className={cn(
-        "w-[var(--sidebar-width)] h-full flex flex-col glass border-r border-white/10 dark:border-white/5",
+        "w-[var(--sidebar-width)] h-full flex flex-col glass-dark relative overflow-hidden",
         className
       )}
     >
-      <div className="flex items-center gap-3 px-4 py-4 border-b border-white/10 dark:border-white/5">
-        <Avatar
-          name={displayName}
-          size="md"
-          src={user?.user_metadata?.avatar_url}
-        />
-        <div className="flex-1 min-w-0">
-          <h2 className="text-sm font-semibold truncate text-gray-900 dark:text-gray-100">
-            {displayName}
-          </h2>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            {user?.email}
-          </p>
+      {/* Ambient glow */}
+      <div className="absolute top-0 left-0 w-48 h-48 bg-bruce-500/5 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Header */}
+      <div className="relative px-5 py-5">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-lg font-bold text-white tracking-tight">
+            Messages
+          </h1>
+          <button className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+            <Plus className="w-4 h-4 text-white/70" />
+          </button>
         </div>
-        <ThemeToggle />
+
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+          <input
+            type="text"
+            placeholder="Search conversations..."
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/5 text-white text-sm placeholder-white/30 outline-none focus:ring-1 focus:ring-bruce-500/30 focus:border-bruce-500/20 transition-all"
+          />
+        </div>
       </div>
 
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+      {/* Nav */}
+      <nav className="relative flex-1 px-3 space-y-0.5 overflow-y-auto">
         {navItems.map((item) => (
           <NavItem
             key={item.href}
-            {...item}
-            active={pathname.startsWith(item.href)}
+            href={item.href}
+            icon={<item.icon className="w-5 h-5" />}
+            label={item.label}
+            active={
+              item.href === "/chat"
+                ? pathname.startsWith("/chat") || pathname.startsWith("/contacts") || pathname.startsWith("/profile") || pathname.startsWith("/settings")
+                  ? pathname.startsWith(item.href)
+                  : pathname === "/"
+                : pathname.startsWith(item.href)
+            }
           />
         ))}
       </nav>
 
-      {children && (
-        <div className="p-3 border-t border-white/10 dark:border-white/5">
-          {children}
+      {/* User profile */}
+      <div className="relative px-3 pb-3">
+        <div className="flex items-center gap-3 px-3 py-3 rounded-2xl bg-white/5">
+          <Avatar
+            name={displayName}
+            size="sm"
+            src={user?.user_metadata?.avatar_url}
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-white truncate">
+              {displayName}
+            </p>
+            <p className="text-[11px] text-white/30 truncate">
+              {user?.email}
+            </p>
+          </div>
+          <ThemeToggle className="!w-7 !h-7" />
         </div>
-      )}
+      </div>
+
+      {children}
     </div>
   );
 }

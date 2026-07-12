@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   Users,
@@ -10,6 +11,8 @@ import {
   Megaphone,
   LogOut,
   Shield,
+  ChevronLeft,
+  Menu,
 } from "lucide-react";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { createClient } from "@/lib/supabase/client";
@@ -20,22 +23,22 @@ import { cn } from "@/lib/cn";
 const navItems = [
   {
     href: "/dashboard",
-    icon: <LayoutDashboard className="w-5 h-5" />,
+    icon: LayoutDashboard,
     label: "Overview",
   },
   {
     href: "/dashboard/users",
-    icon: <Users className="w-5 h-5" />,
+    icon: Users,
     label: "Users",
   },
   {
     href: "/dashboard/reports",
-    icon: <Flag className="w-5 h-5" />,
+    icon: Flag,
     label: "Reports",
   },
   {
     href: "/dashboard/broadcast",
-    icon: <Megaphone className="w-5 h-5" />,
+    icon: Megaphone,
     label: "Broadcast",
   },
 ];
@@ -48,10 +51,10 @@ export default function DashboardLayout({
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     if (loading) return;
-
     if (!user) {
       router.push("/login");
       return;
@@ -64,19 +67,22 @@ export default function DashboardLayout({
         .select("is_admin")
         .eq("id", user!.id)
         .single();
-
       if (!data?.is_admin) {
         router.push("/chat");
       }
     }
-
     checkAdmin();
   }, [user, loading, router]);
 
   if (loading || !user) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="w-8 h-8 border-2 border-bruce-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex h-screen items-center justify-center mesh-gradient dark:opacity-40">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-bruce-400 to-bruce-700 flex items-center justify-center shadow-glow animate-pulse">
+            <Shield className="w-6 h-6 text-white" />
+          </div>
+          <div className="w-8 h-8 border-2 border-bruce-500 border-t-transparent rounded-full animate-spin" />
+        </div>
       </div>
     );
   }
@@ -85,21 +91,38 @@ export default function DashboardLayout({
     user.user_metadata?.display_name || user.email || "Admin";
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--chat-bg)] dark:bg-[var(--chat-bg-dark)]">
+    <div className="flex h-screen overflow-hidden mesh-gradient dark:opacity-40">
       {/* Sidebar */}
-      <aside className="w-64 h-full flex flex-col glass-dark border-r border-white/10">
-        <div className="px-5 py-5 border-b border-white/10">
+      <motion.aside
+        animate={{ width: collapsed ? 80 : 260 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="h-full flex flex-col glass-dark relative overflow-hidden shrink-0"
+      >
+        {/* Header */}
+        <div className="px-4 py-5 border-b border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-bruce-500 to-bruce-700 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-bruce-400 to-bruce-700 flex items-center justify-center shrink-0 shadow-lg shadow-bruce-500/20">
               <Shield className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <h2 className="text-sm font-bold text-white">Chat Bruce</h2>
-              <p className="text-xs text-white/50">Admin Dashboard</p>
-            </div>
+            <AnimatePresence>
+              {!collapsed && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="min-w-0"
+                >
+                  <h2 className="text-sm font-bold text-white truncate">
+                    Chat Bruce
+                  </h2>
+                  <p className="text-xs text-white/40">Admin Dashboard</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
+        {/* Nav */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const isActive =
@@ -108,50 +131,97 @@ export default function DashboardLayout({
                 : pathname.startsWith(item.href);
 
             return (
-              <a
+              <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 text-sm",
+                  "flex items-center gap-3 px-3 py-3 rounded-2xl transition-all duration-200 text-sm group relative",
                   isActive
-                    ? "bg-bruce-500/20 text-bruce-400 font-medium"
-                    : "text-white/60 hover:text-white hover:bg-white/5"
+                    ? "bg-bruce-500/15 text-bruce-400"
+                    : "text-white/50 hover:text-white hover:bg-white/5"
                 )}
               >
-                <span className="shrink-0">{item.icon}</span>
-                <span className="flex-1">{item.label}</span>
-              </a>
+                {isActive && (
+                  <motion.div
+                    layoutId="activeNav"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-bruce-500 rounded-r-full"
+                    transition={{ duration: 0.3 }}
+                  />
+                )}
+                <item.icon className="w-5 h-5 shrink-0" />
+                <AnimatePresence>
+                  {!collapsed && (
+                    <motion.span
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="font-medium truncate"
+                    >
+                      {item.label}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </Link>
             );
           })}
         </nav>
 
-        <div className="p-3 border-t border-white/10">
-          <div className="flex items-center gap-3 px-4 py-3">
+        {/* User + Logout */}
+        <div className="p-3 border-t border-white/5">
+          <div className="flex items-center gap-3 px-3 py-2">
             <Avatar
               name={displayName}
               size="sm"
               src={user.user_metadata?.avatar_url}
             />
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-white truncate">
-                {displayName}
-              </p>
-              <p className="text-xs text-white/40 truncate">{user.email}</p>
-            </div>
-            <ThemeToggle className="!w-7 !h-7" />
+            <AnimatePresence>
+              {!collapsed && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex-1 min-w-0"
+                >
+                  <p className="text-xs font-medium text-white truncate">
+                    {displayName}
+                  </p>
+                  <p className="text-xs text-white/30 truncate">
+                    {user.email}
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-          <button
-            onClick={async () => {
-              await signOut();
-              router.push("/login");
-            }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl text-white/50 hover:text-red-400 hover:bg-white/5 transition-all text-sm mt-1"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Logout</span>
-          </button>
+          <div className="flex items-center gap-1 mt-1">
+            <ThemeToggle className="!w-8 !h-8" />
+            {!collapsed && (
+              <button
+                onClick={async () => {
+                  await signOut();
+                  router.push("/login");
+                }}
+                className="flex-1 flex items-center gap-2 px-3 py-2 rounded-xl text-white/40 hover:text-red-400 hover:bg-white/5 transition-all text-xs"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+              </button>
+            )}
+          </div>
         </div>
-      </aside>
+
+        {/* Collapse toggle */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="absolute top-5 right-0 translate-x-1/2 w-6 h-6 rounded-full glass-dark border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition-colors z-10"
+        >
+          <ChevronLeft
+            className={cn(
+              "w-3 h-3 transition-transform duration-300",
+              collapsed && "rotate-180"
+            )}
+          />
+        </button>
+      </motion.aside>
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">

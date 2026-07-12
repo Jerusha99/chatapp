@@ -13,18 +13,18 @@ interface ChatSearchProps {
 export function ChatSearch({
   value,
   onChange,
-  placeholder = "Search chats...",
+  placeholder = "Search conversations...",
   className,
 }: ChatSearchProps) {
   return (
     <div className={cn("relative px-4 py-3", className)}>
-      <Search className="absolute left-7 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <Search className="absolute left-7 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full pl-9 pr-4 py-2 text-sm rounded-2xl glass bg-white/40 dark:bg-black/20 text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none focus:ring-2 focus:ring-bruce-500/30 transition-all"
+        className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-white/5 border border-white/5 text-white placeholder-white/30 outline-none focus:ring-1 focus:ring-bruce-500/30 focus:border-bruce-500/20 transition-all"
       />
     </div>
   );

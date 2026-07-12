@@ -6,24 +6,20 @@ import { Camera, Save, ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { usersApi } from "@/lib/api/users";
-import { mediaApi } from "@/lib/api/media";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Avatar } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1 },
+    transition: { staggerChildren: 0.06 },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0 },
 };
 
@@ -115,12 +111,11 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="h-full flex flex-col p-6 space-y-6">
-        <Skeleton className="h-8 w-32" />
+        <div className="h-8 w-32 rounded-2xl bg-white/10 animate-pulse" />
         <div className="flex flex-col items-center space-y-4">
-          <Skeleton className="w-24 h-24 rounded-full" />
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-20 w-full max-w-md" />
-          <Skeleton className="h-12 w-32 rounded-2xl" />
+          <div className="w-24 h-24 rounded-full bg-white/10 animate-pulse" />
+          <div className="h-10 w-64 rounded-2xl bg-white/10 animate-pulse" />
+          <div className="h-20 w-full max-w-md rounded-2xl bg-white/10 animate-pulse" />
         </div>
       </div>
     );
@@ -132,22 +127,22 @@ export default function ProfilePage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-lg mx-auto p-6 space-y-6"
+        className="max-w-lg mx-auto p-6 space-y-5"
       >
         <motion.div variants={itemVariants} className="flex items-center gap-3">
           <button
             onClick={() => router.back()}
-            className="p-2 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="p-2 rounded-xl hover:bg-white/5 transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
-          <h1 className="text-xl font-bold">Edit Profile</h1>
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+            Edit Profile
+          </h1>
         </motion.div>
 
-        <motion.div
-          variants={itemVariants}
-          className="glass rounded-3xl p-6 dark:bg-white/5"
-        >
+        {/* Avatar */}
+        <motion.div variants={itemVariants} className="glass-card">
           <div className="flex flex-col items-center space-y-4">
             <div className="relative group">
               <Avatar
@@ -176,25 +171,25 @@ export default function ProfilePage() {
                 </div>
               )}
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Click avatar to upload • Max 5MB
+            <p className="text-xs text-gray-400">
+              Click avatar to upload &bull; Max 5MB
             </p>
           </div>
         </motion.div>
 
-        <motion.div
-          variants={itemVariants}
-          className="glass rounded-3xl p-6 dark:bg-white/5 space-y-5"
-        >
+        {/* Form */}
+        <motion.div variants={itemVariants} className="glass-card space-y-5">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               Display Name
             </label>
-            <Input
+            <input
+              type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Your display name"
               maxLength={50}
+              className="input-glass"
             />
           </div>
 
@@ -208,9 +203,9 @@ export default function ProfilePage() {
               placeholder="Tell us about yourself..."
               maxLength={300}
               rows={4}
-              className="w-full px-4 py-2.5 rounded-2xl glass text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 outline-none transition-all duration-200 focus:ring-2 focus:ring-bruce-500/50 focus:border-bruce-500 dark:bg-black/20 resize-none"
+              className="input-glass resize-none"
             />
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-right">
+            <p className="mt-1 text-xs text-gray-400 text-right">
               {bio.length}/300
             </p>
           </div>
@@ -219,10 +214,11 @@ export default function ProfilePage() {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               Email
             </label>
-            <Input
+            <input
+              type="email"
               value={user?.email || ""}
               disabled
-              className="opacity-60 cursor-not-allowed"
+              className="input-glass opacity-60 cursor-not-allowed"
             />
           </div>
 
@@ -230,25 +226,31 @@ export default function ProfilePage() {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               Phone
             </label>
-            <Input
+            <input
+              type="text"
               value={user?.phone || user?.user_metadata?.phone || "Not set"}
               disabled
-              className="opacity-60 cursor-not-allowed"
+              className="input-glass opacity-60 cursor-not-allowed"
             />
           </div>
         </motion.div>
 
+        {/* Save */}
         <motion.div variants={itemVariants} className="flex justify-end pb-6">
-          <Button
-            variant="primary"
-            size="lg"
-            loading={saving}
+          <button
             onClick={handleSave}
-            className="min-w-[140px]"
+            disabled={saving}
+            className="btn-primary flex items-center gap-2 min-w-[140px] justify-center"
           >
-            <Save className="w-4 h-4 mr-2" />
-            Save Changes
-          </Button>
+            {saving ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                Save Changes
+              </>
+            )}
+          </button>
         </motion.div>
       </motion.div>
     </div>

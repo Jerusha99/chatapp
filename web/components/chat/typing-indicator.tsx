@@ -20,7 +20,7 @@ export function TypingIndicator({ names, className }: TypingIndicatorProps) {
 
   return (
     <div className={cn("flex items-center gap-2 px-4 py-2", className)}>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 bg-white/10 rounded-full px-3 py-1.5">
         {[0, 1, 2].map((i) => (
           <motion.span
             key={i}
@@ -35,7 +35,7 @@ export function TypingIndicator({ names, className }: TypingIndicatorProps) {
           />
         ))}
       </div>
-      <span className="text-xs text-gray-500 dark:text-gray-400 italic">
+      <span className="text-[11px] text-white/30 italic">
         {label}
       </span>
     </div>

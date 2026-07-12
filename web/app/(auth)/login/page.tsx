@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { MessageCircle, Mail, Lock, ArrowRight } from "lucide-react";
+import { Mail, Lock, ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -42,73 +42,80 @@ export default function LoginPage() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="glass rounded-3xl p-8 shadow-xl"
+      initial={{ opacity: 0, y: 30, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="glass-strong rounded-[2rem] p-8 sm:p-10 shadow-float relative overflow-hidden"
     >
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-bruce-400 to-bruce-600 flex items-center justify-center mb-4 shadow-lg shadow-bruce-500/25">
-          <MessageCircle className="w-7 h-7 text-white" />
-        </div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          Welcome Back
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Sign in to continue to Chat Bruce
-        </p>
-      </div>
+      {/* Background glow */}
+      <div className="absolute top-0 right-0 w-40 h-40 bg-bruce-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-32 h-32 bg-bruce-600/5 rounded-full blur-3xl pointer-events-none" />
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/60 dark:bg-black/30 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none focus:ring-2 focus:ring-bruce-500/50 focus:border-bruce-500 transition-all text-sm"
-          />
+      <div className="relative">
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-bruce-400 to-bruce-700 flex items-center justify-center mb-4 shadow-glow">
+            <span className="text-2xl">💬</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Welcome Back
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5">
+            Sign in to continue to Chat Bruce
+          </p>
         </div>
-        <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/60 dark:bg-black/30 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 outline-none focus:ring-2 focus:ring-bruce-500/50 focus:border-bruce-500 transition-all text-sm"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-3 rounded-xl bg-gradient-to-r from-bruce-500 to-bruce-700 text-white font-semibold text-sm flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-bruce-500/25 active:scale-[0.98] transition-all disabled:opacity-50"
-        >
-          {loading ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <>
-              Sign In
-              <ArrowRight className="w-4 h-4" />
-            </>
-          )}
-        </button>
-      </form>
 
-      <div className="mt-6 text-center space-y-3">
-        <Link
-          href="/signup"
-          className="block text-sm text-bruce-500 hover:text-bruce-600 font-medium"
-        >
-          Don&apos;t have an account? Sign Up
-        </Link>
-        <Link
-          href="/phone"
-          className="block text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-        >
-          Sign in with phone number
-        </Link>
+        <form onSubmit={handleSubmit} className="space-y-3.5">
+          <div className="relative group">
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-bruce-500 transition-colors" />
+            <input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input-glass pl-11"
+            />
+          </div>
+          <div className="relative group">
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-bruce-500 transition-colors" />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="input-glass pl-11"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-primary w-full flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <>
+                Sign In
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
+          </button>
+        </form>
+
+        <div className="mt-6 space-y-3 text-center">
+          <Link
+            href="/signup"
+            className="block text-sm text-bruce-500 hover:text-bruce-600 font-medium transition-colors"
+          >
+            Don&apos;t have an account? Sign Up
+          </Link>
+          <Link
+            href="/phone"
+            className="block text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          >
+            Sign in with phone number
+          </Link>
+        </div>
       </div>
     </motion.div>
   );

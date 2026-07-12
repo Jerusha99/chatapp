@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { Send, Paperclip, Smile, Mic, Image, FileText, X } from "lucide-react";
+import { Send, Paperclip, Smile, Mic, X, FileText } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { mediaApi } from "@/lib/api/media";
 
@@ -72,11 +72,11 @@ export function ChatInput({ onSend, onTyping, disabled, className }: ChatInputPr
   };
 
   return (
-    <div className={cn("border-t border-white/10 dark:border-white/5", className)}>
+    <div className={cn("shrink-0", className)}>
       {previewFile && (
-        <div className="px-4 pt-3 flex items-center gap-3 glass">
+        <div className="px-4 pt-3 glass-strong border-b border-white/5">
           {previewFile.preview ? (
-            <div className="relative w-20 h-20 rounded-lg overflow-hidden">
+            <div className="relative w-20 h-20 rounded-2xl overflow-hidden">
               <img
                 src={previewFile.preview}
                 alt="Preview"
@@ -87,20 +87,22 @@ export function ChatInput({ onSend, onTyping, disabled, className }: ChatInputPr
                   if (previewFile.preview) URL.revokeObjectURL(previewFile.preview);
                   setPreviewFile(null);
                 }}
-                className="absolute top-1 right-1 p-0.5 rounded-full bg-black/60 text-white"
+                className="absolute top-1.5 right-1.5 p-1 rounded-full bg-black/60 text-white backdrop-blur-sm"
               >
                 <X className="w-3 h-3" />
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 dark:bg-white/5">
-              <FileText className="w-5 h-5 text-bruce-500" />
-              <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[200px]">
+            <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/5 border border-white/5">
+              <div className="w-10 h-10 rounded-xl bg-bruce-500/20 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-bruce-400" />
+              </div>
+              <span className="text-sm text-white/70 truncate max-w-[200px]">
                 {previewFile.file.name}
               </span>
               <button
                 onClick={() => setPreviewFile(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="ml-auto text-white/40 hover:text-white/70 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -109,7 +111,7 @@ export function ChatInput({ onSend, onTyping, disabled, className }: ChatInputPr
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex items-center gap-2 px-4 py-3 glass">
+      <form onSubmit={handleSubmit} className="flex items-end gap-2 px-4 py-3 glass-strong border-t border-white/5">
         <input
           ref={fileInputRef}
           type="file"
@@ -122,7 +124,7 @@ export function ChatInput({ onSend, onTyping, disabled, className }: ChatInputPr
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="shrink-0 p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400"
+          className="shrink-0 p-2.5 rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-colors text-gray-500 dark:text-gray-400"
         >
           <Paperclip className="w-5 h-5" />
         </button>
@@ -139,13 +141,13 @@ export function ChatInput({ onSend, onTyping, disabled, className }: ChatInputPr
             onKeyDown={handleKeyDown}
             placeholder={uploading ? "Uploading..." : "Type a message..."}
             disabled={disabled || uploading}
-            className="w-full px-4 py-2.5 rounded-2xl bg-white/60 dark:bg-black/30 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 outline-none text-sm"
+            className="w-full px-4 py-2.5 rounded-2xl bg-white/10 dark:bg-white/5 text-white placeholder-white/30 outline-none text-sm border border-white/5 focus:border-bruce-500/30 focus:ring-1 focus:ring-bruce-500/20 transition-all"
           />
         </div>
 
         <button
           type="button"
-          className="shrink-0 p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-gray-500 dark:text-gray-400"
+          className="shrink-0 p-2.5 rounded-xl hover:bg-white/10 dark:hover:bg-white/5 transition-colors text-gray-500 dark:text-gray-400"
         >
           <Smile className="w-5 h-5" />
         </button>
@@ -153,12 +155,12 @@ export function ChatInput({ onSend, onTyping, disabled, className }: ChatInputPr
         <button
           type="submit"
           disabled={(!message.trim() && !previewFile) || disabled || uploading}
-          className="shrink-0 p-2.5 rounded-full bg-gradient-to-r from-bruce-500 to-bruce-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg hover:shadow-bruce-500/25 active:scale-95"
+          className="shrink-0 p-2.5 rounded-xl bg-gradient-to-r from-bruce-500 to-bruce-700 text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all hover:shadow-glow active:scale-95"
         >
           {uploading ? (
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
           ) : (
-            <Send className="w-4 h-4" />
+            <Send className="w-5 h-5" />
           )}
         </button>
       </form>

@@ -6,7 +6,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden mesh-gradient dark:opacity-30">
       <div className="hidden lg:flex h-full">
         <AppSidebar />
       </div>

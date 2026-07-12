@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { ChatItem } from "@/components/chat/chat-item";
-import { ChatSearch } from "@/components/chat/chat-search";
 import { ChatListSkeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useChats } from "@/lib/hooks/use-chat";
@@ -24,17 +23,19 @@ export function ChatList() {
 
   return (
     <div className="flex flex-col h-full">
-      <ChatSearch value={search} onChange={setSearch} />
-
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto px-2 py-2 space-y-0.5">
         {loading ? (
           <ChatListSkeleton />
         ) : filtered.length === 0 ? (
-          <EmptyState
-            icon={<MessageCircle className="w-12 h-12" />}
-            title="No chats yet"
-            description="Start a new conversation to see it here"
-          />
+          <div className="flex flex-col items-center justify-center h-full text-center px-6">
+            <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+              <MessageCircle className="w-8 h-8 text-white/20" />
+            </div>
+            <p className="text-sm text-white/40 font-medium">No conversations</p>
+            <p className="text-xs text-white/20 mt-1">
+              Start a new chat to see it here
+            </p>
+          </div>
         ) : (
           filtered.map((chat) => (
             <ChatItem
